@@ -1,75 +1,114 @@
-// defines note frequencies
 let noteFrequencies = {
+    'C3': 261.63,
+    'C#3': 277.18,
+    'D3': 293.66,
+    'D#3': 311.13,
+    'E3': 329.63,
+    'F3': 349.23,
+    'F#3': 369.99,
+    'G3': 392.00,
+    'G#3': 415.30,
+    'A3': 440.00,
+    'A#3': 466.16,
+    'B3': 493.88,
     'C4': 261.63,
-    'C#': 277.18,
-    'D': 293.66,
-    'D#': 311.13,
-    'E': 329.63,
-    'F': 349.23,
-    'F#': 369.99,
-    'G': 392.00,
-    'G#': 415.30,
-    'A': 440.00,
-    'A#': 466.1638,
-    'B': 493.88,
+    'C#4': 277.18,
+    'D4': 293.66,
+    'D#4': 311.13,
+    'E4': 329.63,
+    'F4': 349.23,
+    'F#4': 369.99,
+    'G4': 392.00,
+    'G#4': 415.30,
+    'A4': 440.00,
+    'A#4': 466.16,
+    'B4': 493.88,
     'C5': 523.25,
     'C#5': 554.36,
-    'D5': 587.32
+    'D5': 587.32,
+    'D#5': 622.26,
+    'E5': 659.26,
+    'F5': 698.46,
+    'F#5': 739.98,
+    'G5': 784.00,
+    'G#5': 830.60,
+    'A5': 880.00,
+    'A#5': 932.32,
+    'B5': 987.76,
+    'C6': 1046.5,
 };
 
 let midiNotes = {
+    48: 'C3',
+    49: 'C#3',
+    50: 'D3',
+    51: 'D#3',
+    52: 'E3',
+    53: 'F3',
+    54: 'F#3',
+    55: 'G3',
+    56: 'G#3',
+    57: 'A3',
+    58: 'A#3',
+    59: 'B3',
     60: 'C4',
-    61: 'C#',
-    62: 'D',
-    63: 'D#',
-    64: 'E',
-    65: 'F',
-    66: 'F#',
-    67: 'G',
-    68: 'G#',
-    69: 'A',
-    70: 'A#',
-    71: 'B',
+    61: 'C#4',
+    62: 'D4',
+    63: 'D#4',
+    64: 'E4',
+    65: 'F4',
+    66: 'F#4',
+    67: 'G4',
+    68: 'G#4',
+    69: 'A4',
+    70: 'A#4',
+    71: 'B4',
     72: 'C5',
     73: 'C#5',
-    74: 'D5'
+    74: 'D5',
+    75: 'D#5',
+    76: 'E5',
+    77: 'F5',
+    78: 'F#5',
+    79: 'G5',
+    80: 'G#5',
+    81: 'A5',
+    82: 'A#5',
+    83: 'B5',
+    84: 'C6',
 }
 
-let keyNotes = {
-    60: 'C4',
-    61: 'C#',
-    62: 'D',
-    63: 'D#',
-    64: 'E',
-    65: 'F',
-    66: 'F#',
-    67: 'G',
-    68: 'G#',
-    69: 'A',
-    70: 'A#',
-    71: 'B',
-    72: 'C5',
-    73: 'C#5',
-    74: 'D5'
+let letterNotes = {
+    'a': 'C4',
+    'w': 'C#4',
+    's': 'D4',
+    'e': 'D#4',
+    'd': 'E4',
+    'f': 'F4',
+    't': 'F#4',
+    'g': 'G4',
+    'y': 'G#4',
+    'h': 'A4',
+    'u': 'A#4',
+    'j': 'B4',
+    'k': 'C5',
+    'o': 'C#5',
+    'l': 'D5',
 }
 
 const activeNotes = new Map();
 
-// Create an audio context
-let AudioContext = window.AudioContext || window.webkitAudioContext;
-const context = new AudioContext();
-//const startMsg = document.getElementById('start-msg');
-const keys = document.querySelectorAll('.key');
+const context = new (window.AudioContext || window.wedkitAudioContext)();
+
 const masterVol = context.createGain();
 masterVol.connect(context.destination);
 
 const canvas = document.getElementById('adsr-canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
-const canvasWidth = canvas.width;
 canvas.height = 200;
-const canvasHeight = canvas.height;
 
+const keys = document.querySelectorAll('.key');
 const masterKnob = document.getElementById('master');
 masterVol.gain.value = masterKnob.value;
 const attackKnob = document.getElementById('attack');
@@ -78,38 +117,90 @@ const decayKnob = document.getElementById('decay');
 const sustainKnob = document.getElementById('sustain');
 const releaseKnob = document.getElementById('release');
 const waveforms = document.getElementsByName('waveform');
+const values = document.getElementById('value-nums');
 let waveform = 'sine';
-
 let currentAttack = parseFloat(attackKnob.value);
 let currentPeak = parseFloat(peakKnob.value);
 let currentDecay = parseFloat(decayKnob.value);
 let currentSustain = parseFloat(sustainKnob.value);
 let currentRelease = parseFloat(releaseKnob.value);
-let decayEnd = currentAttack + currentDecay;
-let sustainEnd = decayEnd + 0.1;
-let releaseEnd = sustainEnd + currentRelease;
 
-function drawADSR() {
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    ctx.fillStyle = 'grey';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    decayEnd = currentAttack + currentDecay;
-    sustainEnd = decayEnd + 0.1;
-    releaseEnd = sustainEnd + currentRelease;
-    ctx.beginPath();
-    ctx.moveTo(0, canvasHeight);
-    ctx.lineTo(currentAttack * canvasWidth, canvasHeight * (1 - currentPeak));
-    ctx.lineTo(decayEnd * (canvasWidth), canvasHeight * (1 - currentSustain));
-    ctx.lineTo(sustainEnd * canvasWidth, canvasHeight * (1 - currentSustain));
-    ctx.lineTo(releaseEnd * canvasWidth, canvasHeight);
 
-    ctx.strokeStyle = 'blue';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+
+function playNote(note) {
+    if(!activeNotes.has(note)) {
+        const oscillator = context.createOscillator();
+        oscillator.type = waveform;
+        oscillator.frequency.setValueAtTime(noteFrequencies[note], context.currentTime);
+        console.log(currentDecay)
+        values.textContent = `M: ${masterVol.gain.value}, A: ${currentAttack}, P: ${currentPeak}, D: ${currentDecay}, S: ${currentSustain}, R: ${currentRelease}`;
+
+        const envelope = context.createGain();
+        //console.log(context.currentTime)
+        envelope.gain.setValueAtTime(0, context.currentTime);
+        //console.log(context.currentTime)
+
+        envelope.gain.linearRampToValueAtTime(currentPeak, context.currentTime + currentAttack);
+        //console.log(context.currentTime)
+
+        envelope.gain.exponentialRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
+        //console.log(context.currentTime)
+
+
+        oscillator.start(0);
+        //console.log(context.currentTime)
+
+        activeNotes.set(note, [oscillator, envelope]);
+        activeKey(note);
+        oscillator.connect(envelope);
+        envelope.connect(masterVol);
+    }
+
 }
 
-drawADSR();
+function releaseNote(note) {
+    const oscillator = activeNotes.get(note)[0];
+    const envelope = activeNotes.get(note)[1];
 
+    //console.log(context.currentTime)
+    console.log(envelope.gain.value)
+
+    envelope.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + currentRelease);
+    //console.log(context.currentTime)
+    console.log(envelope.gain.value)
+    if(envelope.gain.value == 0.00001) {
+        console.log('yes')
+        oscillator.stop(context.currentTime + currentAttack + currentAttack + currentRelease);
+    }
+    //console.log(context.currentTime)
+    activeNotes.delete(note)
+    activeKey(note);
+}
+
+function drawADSR() {
+
+}
+
+function activeKey(note) {
+    const key = document.querySelector(`[data-note="${note}"]`);
+    if(activeNotes.has(note)) {
+        key.classList.add('active-key');
+    } else {
+        key.classList.remove('active-key');
+    }
+}
+
+waveforms.forEach(waveformSel => {
+    waveformSel.addEventListener('change', () => {
+        if(waveformSel.checked) {
+            waveform = waveformSel.value;
+        }
+    })
+})
+
+masterKnob.addEventListener('input', () => {
+    masterVol.gain.value = masterKnob.value;
+})
 attackKnob.addEventListener('input', () => {
     currentAttack = parseFloat(attackKnob.value);
     drawADSR();
@@ -131,150 +222,15 @@ releaseKnob.addEventListener('input', () => {
     drawADSR();
 })
 
-function playNote(note) {
-    //console.log(activeNotes)
-    if(!activeNotes.has(note)) {
-        const oscillator = context.createOscillator();
-        oscillator.type = waveform; // You can change this to 'sine', 'square', 'sawtooth', or 'triangle'
-        oscillator.frequency.setValueAtTime(noteFrequencies[note], context.currentTime);
-
-        console.log(`M: ${masterVol}, A: ${currentAttack}, P: ${currentPeak}, D: ${currentDecay}, S: ${currentSustain}, R: ${currentRelease}`);
-
-        const envelope = context.createGain();
-        envelope.gain.setValueAtTime(0, 0);
-        envelope.gain.linearRampToValueAtTime(currentPeak, context.currentTime + currentAttack);
-        envelope.gain.exponentialRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
-        // envelope.gain.linearRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay + 1);
-        // envelope.gain.linearRampToValueAtTime(0, context.currentTime + currentAttack + currentDecay + 1 + currentRelease);
-
-        // envelope.gain.linearRampToValueAtTime(currentPeak, context.currentTime + currentAttack);
-        // envelope.gain.setValueAtTime(currentPeak, context.currentTime);
-        // envelope.gain.linearRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
-        // envelope.gain.setValueAtTime(currentSustain, context.currentTime);
-        // envelope.gain.linearRampToValueAtTime(0, context.currentTime + currentAttack + currentDecay + currentRelease);
-
-        oscillator.start(0);
-        activeNotes.set(note, oscillator)
-        activeKey(note, true)
-        //oscillator.stop(context.currentTime + currentAttack + currentDecay + 1 + currentRelease);
-        oscillator.connect(envelope);
-        envelope.connect(masterVol);
-    }
-}
-
-function releaseNote(note) {
-    //console.log(activeNotes)
-    if(activeNotes.has(midiNotes[note])) {
-
-        const oscillator = activeNotes.get(midiNotes[note]);
-        
-        oscillator.stop();
-        activeNotes.delete(midiNotes[note])
-        activeKey(midiNotes[note], false)
-    }
-}
-
-function activeKey(note, isActive) {
-    //console.log(note)
-    const key = document.querySelector(`[data-note="${note}"]`);
-    //console.log(key)
-    if (key) {
-        if (isActive) {
-            key.classList.add('active-key');
-        } else {
-            key.classList.remove('active-key');
-        }
-    }
-}
-
-
-
-waveforms.forEach(waveformSel => {
-    waveformSel.addEventListener('change', () => {
-        if(waveformSel.checked) {
-            waveform = waveformSel.value;
-        }
-    })
-})
-
-masterKnob.addEventListener('input', () => {
-    masterVol.gain.value = masterKnob.value;
-})
-
 keys.forEach(key => {
     key.addEventListener('mousedown', () => {
         playNote(key.getAttribute('data-note'));
-        key.classList.add('active-key');
     })
     key.addEventListener('mouseup', () => {
-        key.classList.remove('active-key');
+        releaseNote(key.getAttribute('data-note'));
     })
 });
 
-document.addEventListener('keydown', event => {
-    switch(event.key.toLowerCase()) {
-        case 'a':
-            playNote('C4');
-            break;
-        case 'w':
-            playNote('C#');
-            break;
-        case 's':
-            playNote('D');
-            break;
-        case 'e':
-            playNote('D#');
-            break;
-        case 'd':
-            playNote('E');
-            break;
-        case 'f':
-            playNote('F');
-            break;
-        case 't':
-            playNote('F#')
-        case 'g':
-            playNote('G');
-            break;
-        case 'y':
-            playNote('G#');
-            break;
-        case 'h':
-            playNote('A');
-            break;
-        case 'u':
-            playNote('A#');
-            break;
-        case 'j':
-            playNote('B');
-            break;
-        case 'k':
-            playNote('C5');
-            break;
-        case 'o':
-            playNote('C#5');
-            break;
-        case 'l':
-            playNote('D5');
-            break;
-        case 'x':
-            for(note in noteFrequencies) {
-                noteFrequencies[note] = noteFrequencies[note] * 2;
-            }
-            break;
-        case 'z':
-            for(note in noteFrequencies) {
-                noteFrequencies[note] = noteFrequencies[note] / 2;
-            }
-            break;
-    }
-});
-
-document.addEventListener('keyup', event => {
-    event.key.releaseNote
-})
-
-// Check for Web MIDI API support
 if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess()
         .then(onMIDISuccess)
@@ -305,6 +261,28 @@ function onMIDIMessage(event) {
     } else if (command === 128) { // Note off
         // Release the note in your synthesizer
         //console.log(note)
-        releaseNote(note);
+        releaseNote(midiNotes[note]);
     }
 }
+
+document.addEventListener('keydown', event => {
+    let key = event.key.toLowerCase();
+    if(key in letterNotes) {
+        playNote(letterNotes[key]);
+    } else if(key == 'x') {
+        for(note in noteFrequencies) {
+            noteFrequencies[note] = noteFrequencies[note] * 2;
+        }
+    } else if(key == 'z') {
+        for(note in noteFrequencies) {
+            noteFrequencies[note] = noteFrequencies[note] / 2;
+        }
+    }
+});
+
+document.addEventListener('keyup', event => {
+    let key = event.key.toLowerCase();
+    if(key in letterNotes) {
+        releaseNote(letterNotes[key]);
+    }
+});
