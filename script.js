@@ -124,7 +124,8 @@ let currentPeak = parseFloat(peakKnob.value);
 let currentDecay = parseFloat(decayKnob.value);
 let currentSustain = parseFloat(sustainKnob.value);
 let currentRelease = parseFloat(releaseKnob.value);
-
+let sustainStart = context.currentTime;
+let sustainEnd = context.currentTime;
 
 
 function playNote(note) {
@@ -132,7 +133,6 @@ function playNote(note) {
         const oscillator = context.createOscillator();
         oscillator.type = waveform;
         oscillator.frequency.setValueAtTime(noteFrequencies[note], context.currentTime);
-        console.log(currentDecay)
         values.textContent = `M: ${masterVol.gain.value}, A: ${currentAttack}, P: ${currentPeak}, D: ${currentDecay}, S: ${currentSustain}, R: ${currentRelease}`;
 
         const envelope = context.createGain();
@@ -146,7 +146,7 @@ function playNote(note) {
         envelope.gain.exponentialRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
         //console.log(context.currentTime)
 
-
+        sustainStart = context.currentTime;
         oscillator.start(0);
         //console.log(context.currentTime)
 
@@ -161,17 +161,16 @@ function playNote(note) {
 function releaseNote(note) {
     const oscillator = activeNotes.get(note)[0];
     const envelope = activeNotes.get(note)[1];
+    let sustainEnd = context.currentTime - sustainStart;
 
     //console.log(context.currentTime)
-    console.log(envelope.gain.value)
+    //console.log(envelope.gain.value)
 
-    envelope.gain.exponentialRampToValueAtTime(0.00001, context.currentTime + currentRelease);
+    envelope.gain.exponentialRampToValueAtTime(0.00001, sustainEnd + currentRelease);
     //console.log(context.currentTime)
-    console.log(envelope.gain.value)
-    if(envelope.gain.value == 0.00001) {
-        console.log('yes')
-        oscillator.stop(context.currentTime + currentAttack + currentAttack + currentRelease);
-    }
+    //console.log(sustainEnd)
+    console.log(sustainEnd + currentAttack + currentDecay + currentRelease)
+    oscillator.stop(sustainEnd + currentAttack + currentDecay + currentRelease)
     //console.log(context.currentTime)
     activeNotes.delete(note)
     activeKey(note);
