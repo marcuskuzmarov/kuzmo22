@@ -228,6 +228,12 @@ keys.forEach(key => {
     key.addEventListener('mouseup', () => {
         releaseNote(key.getAttribute('data-note'));
     })
+    key.addEventListener('touchstart', () => {
+        playNote(key.getAttribute('data-note'));
+    })
+    key.addEventListener('touchend', () => {
+        releaseNote(key.getAttribute('data-note'));
+    })
 });
 
 if (navigator.requestMIDIAccess) {
