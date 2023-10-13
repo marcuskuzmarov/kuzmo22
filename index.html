@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Basic Synthesizer</title>
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+    <!-- <h1 id="start-msg">Click Anywhere To Start!</h1> -->
+
+    <div id="keyboard">
+        <div class="key white-key" data-note="C4"><h2>C4</h2></div>
+        <div class="key black-key" data-note="C#"></div>
+        <div class="key white-key" data-note="D"></div>
+        <div class="key black-key" data-note="D#"></div>
+        <div class="key white-key" data-note="E"></div>
+        <div class="key white-key" data-note="F"></div>
+        <div class="key black-key" data-note="F#"></div>
+        <div class="key white-key" data-note="G"></div>
+        <div class="key black-key" data-note="G#"></div>
+        <div class="key white-key" data-note="A"></div>
+        <div class="key black-key" data-note="A#"></div>
+        <div class="key white-key" data-note="B"></div>
+        <div class="key white-key" data-note="C5"><h2>C5</h2></div>
+        <div class="key black-key" data-note="C#5"></div>
+        <div class="key white-key" data-note="D5"></div>
+
+    </div>
+
+    <div id="waveforms">
+        <input type="radio" id="sine-wave" name="waveform" value="sine" checked>
+        <label for="sin-wave">Sine Wave</label><br>
+        <input type="radio" id="square-wave" name="waveform" value="square">
+        <label for="square-wave">Square Wave</label><br>
+        <input type="radio" id="triangle-wave" name="waveform" value="triangle">
+        <label for="triangle-wave">Triangle Wave</label><br>
+        <input type="radio" id="sawtooth-wave" name="waveform" value="sawtooth">
+        <label for="sawtooth">Sawtooth Wave</label>
+    </div>
+
+    <div id="controls">
+        <label for="master">Master:</label>
+        <input type="range" id="master" min="0" max="1" step="0.1" value="0.5">
+        <label for="peak">Peak:</label>
+        <input type="range" id="peak" min="0" max="1" step="0.1" value="1">
+        <label for="attack">Attack:</label>
+        <input type="range" id="attack" min="0" max="10" step="0.01" value="0.1">
+        <label for="decay">Decay:</label>
+        <input type="range" id="decay" min="0.1" max="10" step="0.01" value="1">
+        <label for="sustain">Sustain:</label>
+        <input type="range" id="sustain" min="0" max="1" step="0.01" value="0.1">
+        <label for="release">Release:</label>
+        <input type="range" id="release" min="0.1" max="10" step="0.01" value="0.4">
+    </div>
+
+    <div id="adsr">
+        <canvas id="adsr-canvas"></canvas>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
