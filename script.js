@@ -1,16 +1,16 @@
 let noteFrequencies = {
-    'C3': 261.63,
-    'C#3': 277.18,
-    'D3': 293.66,
-    'D#3': 311.13,
-    'E3': 329.63,
-    'F3': 349.23,
-    'F#3': 369.99,
-    'G3': 392.00,
-    'G#3': 415.30,
-    'A3': 440.00,
-    'A#3': 466.16,
-    'B3': 493.88,
+    'C3': 130.82,
+    'C#3': 138.59,
+    'D3': 146.83,
+    'D#3': 155.57,
+    'E3': 164.82,
+    'F3': 174.62,
+    'F#3': 184.00,
+    'G3': 196.00,
+    'G#3': 207.65,
+    'A3': 220.00,
+    'A#3': 233.08,
+    'B3': 246.94,
     'C4': 261.63,
     'C#4': 277.18,
     'D4': 293.66,
@@ -124,6 +124,7 @@ let currentPeak = parseFloat(peakKnob.value);
 let currentDecay = parseFloat(decayKnob.value);
 let currentSustain = parseFloat(sustainKnob.value);
 let currentRelease = parseFloat(releaseKnob.value);
+const ADSR = {currentAttack: parseFloat(attackKnob.value), currentDecay: parseFloat(decayKnob.value), currentSustain: parseFloat(sustainKnob.value), currentRelease: parseFloat(releaseKnob.value)}
 let sustainStart = context.currentTime;
 let sustainEnd = context.currentTime;
 
@@ -137,17 +138,18 @@ function playNote(note) {
 
         const envelope = context.createGain();
         //console.log(context.currentTime)
+        oscillator.start(0);
         envelope.gain.setValueAtTime(0, context.currentTime);
         //console.log(context.currentTime)
 
         envelope.gain.linearRampToValueAtTime(currentPeak, context.currentTime + currentAttack);
         //console.log(context.currentTime)
-
-        envelope.gain.exponentialRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
+        envelope.gain.setTargetAtTime(currentSustain, context.currentTime + currentAttack, currentDecay);
+        //envelope.gain.exponentialRampToValueAtTime(currentSustain, context.currentTime + currentAttack + currentDecay);
         //console.log(context.currentTime)
 
         sustainStart = context.currentTime;
-        oscillator.start(0);
+
         //console.log(context.currentTime)
 
         activeNotes.set(note, [oscillator, envelope]);
@@ -161,16 +163,18 @@ function playNote(note) {
 function releaseNote(note) {
     const oscillator = activeNotes.get(note)[0];
     const envelope = activeNotes.get(note)[1];
+    envelope.gain.cancelScheduledValues(0)
     let sustainEnd = context.currentTime - sustainStart;
+    envelope.gain.setValueAtTime(envelope.gain.value, context.currentTime)
 
     //console.log(context.currentTime)
     //console.log(envelope.gain.value)
 
-    envelope.gain.exponentialRampToValueAtTime(0.00001, sustainEnd + currentRelease);
+    envelope.gain.exponentialRampToValueAtTime(0.0000001, context.currentTime + currentRelease);
     //console.log(context.currentTime)
     //console.log(sustainEnd)
     console.log(sustainEnd + currentAttack + currentDecay + currentRelease)
-    oscillator.stop(sustainEnd + currentAttack + currentDecay + currentRelease)
+    //oscillator.stop(sustainEnd + currentAttack + currentDecay + currentRelease)
     //console.log(context.currentTime)
     activeNotes.delete(note)
     activeKey(note);
