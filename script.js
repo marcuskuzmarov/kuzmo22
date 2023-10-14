@@ -127,6 +127,25 @@ let currentRelease = parseFloat(releaseKnob.value);
 const ADSR = {currentAttack: parseFloat(attackKnob.value), currentDecay: parseFloat(decayKnob.value), currentSustain: parseFloat(sustainKnob.value), currentRelease: parseFloat(releaseKnob.value)}
 let sustainStart = context.currentTime;
 let sustainEnd = context.currentTime;
+let filterFreq = document.getElementById('freq');
+let filterQ = document.getElementById('q');
+let currentFreq = parseFloat(filterFreq.value);
+let currentQ = parseFloat(filterQ.value);
+let delayTime = document.getElementById('delay-time');
+let delayFeedback = document.getElementById('feedback');
+let currentDelay = parseFloat(delayTime.value);
+let currentFeedback = parseFloat(delayFeedback.value);
+
+let waveVisual = document.getElementById('wave-canvas');
+waveVisualContext = waveVisual.getContext('2d');
+waveVisual.height = 300;
+waveVisual.width = window.innerWidth;
+const analyser = context.createAnalyser();
+analyser.fftSize = 2048;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+
+const source = context.createMediaElementSource()
 
 
 function playNote(note) {
@@ -137,6 +156,14 @@ function playNote(note) {
         values.textContent = `M: ${masterVol.gain.value}, A: ${currentAttack}, P: ${currentPeak}, D: ${currentDecay}, S: ${currentSustain}, R: ${currentRelease}`;
 
         const envelope = context.createGain();
+        const filter = context.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = currentFreq;
+        filter.Q.value = currentQ;
+        const delayNode = context.createDelay();
+        delayNode.delayTime.value = currentDelay;
+        const delayGain = context.createGain();
+        delayGain.gain.value = currentFeedback;
         //console.log(context.currentTime)
         oscillator.start(0);
         envelope.gain.setValueAtTime(0, context.currentTime);
@@ -155,7 +182,15 @@ function playNote(note) {
         activeNotes.set(note, [oscillator, envelope]);
         activeKey(note);
         oscillator.connect(envelope);
-        envelope.connect(masterVol);
+        envelope.connect(filter);
+
+        filter.connect(masterVol);
+        delayNode.connect(masterVol);
+        filter.connect(delayNode);
+        delayNode.connect(delayGain);
+        delayGain.connect(delayNode);
+
+        drawWave();
     }
 
 }
@@ -181,6 +216,11 @@ function releaseNote(note) {
 }
 
 function drawADSR() {
+
+}
+
+function drawWave() {
+    drawVisual = requestAnimationFrame(waveVisual);
 
 }
 
@@ -223,6 +263,20 @@ sustainKnob.addEventListener('input', () => {
 releaseKnob.addEventListener('input', () => {
     currentRelease = parseFloat(releaseKnob.value);
     drawADSR();
+})
+filterFreq.addEventListener('input', () => {
+    currentFreq = parseFloat(filterFreq.value);
+    drawADSR();
+});
+filterQ.addEventListener('input', () => {
+    currentQ = parseFloat(filterQ.value);
+    drawADSR();
+});
+delayTime.addEventListener('input', () => {
+    currentDelay = parseFloat(delayTime.value);
+})
+delayFeedback.addEventListener('input', () => {
+    currentFeedback = parseFloat(delayFeedback.value);
 })
 
 keys.forEach(key => {
