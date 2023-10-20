@@ -145,8 +145,6 @@ analyser.fftSize = 2048;
 const bufferLength = analyser.frequencyBinCount;
 const dataArray = new Uint8Array(bufferLength);
 
-const source = context.createMediaElementSource()
-
 
 function playNote(note) {
     if(!activeNotes.has(note)) {
@@ -190,7 +188,7 @@ function playNote(note) {
         delayNode.connect(delayGain);
         delayGain.connect(delayNode);
 
-        drawWave();
+        //drawWave();
     }
 
 }

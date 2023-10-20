@@ -18,22 +18,34 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #333;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 0;
 }
 
-#keyboard {
+.synth {
     display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.keyboard {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .key {
     width: 40px;
-    height: 150px;
+    height: 120px;
+    background-color: #777;
+    border: 1px solid #444;
     margin: 5px;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    user-select: none;
 }
 
 .white-key {
@@ -46,4 +58,30 @@ body {
 
 .active-key {
     background-color: red;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.adsr, .filter {
+    background-color: #555;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+}
+
+label {
+    color: #ccc;
+    margin-top: 5px;
+}
+
+input[type="range"] {
+    width: 200px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    margin: 5px 0;
 }
