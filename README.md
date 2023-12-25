@@ -1,2 +1,2 @@
 # kuzmo22
-music shit
+building a synth web app take one
